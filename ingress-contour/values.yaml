@@ -1,0 +1,6 @@
+contour:
+  envoy:
+    service:
+      ports:
+        http: 28000
+        https: 28443

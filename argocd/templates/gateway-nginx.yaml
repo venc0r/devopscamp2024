@@ -1,0 +1,24 @@
+{{- if eq "gateway-nginx" .Values.targetRevision }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gateway-nginx
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: gateway-nginx
+    server: https://kubernetes.default.svc
+  project: default
+  revisionHistoryLimit: 10
+  source:
+    path: gateway-nginx
+    repoURL: https://github.com/venc0r/devopscamp2024.git
+    targetRevision: {{ .Values.targetRevision }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}

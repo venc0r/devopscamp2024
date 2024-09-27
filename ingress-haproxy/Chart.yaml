@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ingress-haproxy
+description: haproxy argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: kubernetes-ingress
+  version: 1.41.0
+  repository: https://haproxytech.github.io/helm-charts

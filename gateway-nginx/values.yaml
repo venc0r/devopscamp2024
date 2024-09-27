@@ -1,0 +1,3 @@
+nginx-gateway-fabric:
+  service:
+    create: false

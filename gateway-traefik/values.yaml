@@ -1,0 +1,45 @@
+traefik:
+
+  logs:
+    general:
+      level: "DEBUG"  # @schema enum:[INFO,WARN,ERROR,FATAL,PANIC,DEBUG]; default: "INFO"
+    access:
+      enabled: true
+      retryattempts: false
+
+  gateway:
+    enabled: true
+    name: gateway
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-gateway
+    listeners:
+      web:
+        namespacePolicy: All
+
+      argocd-listener:
+        port: 8443 # .Values.ports.websecure.port
+        protocol: HTTPS
+        hostname: "argocd.dvoc24.v3nc.org"
+        namespacePolicy: All
+        certificateRefs:
+        - kind: Secret
+          group: ""
+          name: argocd-dvoc24-v3nc-org
+        mode: Terminate
+
+      pacman-listener:
+        port: 8443 # .Values.ports.websecure.port
+        protocol: HTTPS
+        hostname: "pacman.dvoc24.v3nc.org"
+        namespacePolicy: All
+        certificateRefs:
+        - kind: Secret
+          group: ""
+          name: pacman-dvoc24-v3nc-org
+        mode: Terminate
+
+  gatewayClass:
+    enabled: true
+  providers:
+    kubernetesGateway:
+      enabled: true

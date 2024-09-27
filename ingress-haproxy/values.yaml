@@ -1,0 +1,7 @@
+kubernetes-ingress:
+  controller:
+    service:
+      type: LoadBalancer
+      ports:
+        http: 18000
+        https: 18443

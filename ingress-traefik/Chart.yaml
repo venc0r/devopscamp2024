@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ingress-traefik
+description: traefik argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: traefik
+  version: 27.0.2
+  repository: https://traefik.github.io/charts

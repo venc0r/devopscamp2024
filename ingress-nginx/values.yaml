@@ -1,0 +1,7 @@
+ingress-nginx:
+  controller:
+    service:
+      ports:
+        # must be used acme only supports 80 for http challenges
+        http: 80
+        https: 443
