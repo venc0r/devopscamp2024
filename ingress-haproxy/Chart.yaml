@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ingress-haproxy
+description: haproxy argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: haproxy-ingress
+  version: 0.14.7
+  repository: https://haproxy-ingress.github.io/charts

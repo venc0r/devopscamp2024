@@ -1,0 +1,6 @@
+traefik:
+  ports:
+    web:
+      exposedPort: 38000
+    websecure:
+      exposedPort: 38443
