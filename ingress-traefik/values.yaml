@@ -1,0 +1,4 @@
+# traefik:
+#   ingressClass:
+#     enabled: true
+#     isDefaultClass: true

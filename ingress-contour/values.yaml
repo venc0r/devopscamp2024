@@ -1,0 +1,4 @@
+# contour:
+#   contour:
+#     ingressClass: true
+#      default: true

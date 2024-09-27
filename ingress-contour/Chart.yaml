@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ingress-contour
+description: ingress-coutour argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: contour
+  version: 19.0.3
+  repository: https://charts.bitnami.com/bitnami
