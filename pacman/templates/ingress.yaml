@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: privatebin
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pacman.demo.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: pacman
+            port:
+              name: http
+        path: /
+        pathType: Prefix
