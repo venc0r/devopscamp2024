@@ -1,3 +1,5 @@
+templates:
+  enabled: false
 pacman:
   ingress:
     create: true
