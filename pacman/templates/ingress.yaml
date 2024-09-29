@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pacman
+  name: pacman-ingress
 spec:
   ingressClassName: nginx
   rules:
