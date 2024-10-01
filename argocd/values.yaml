@@ -1,0 +1,7 @@
+argo-cd:
+  server:
+    ingress:
+      enabled: true
+      https: false
+      ingressClassName: nginx
+      hostname: argocd.dvoc24.v3nc.org

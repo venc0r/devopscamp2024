@@ -4,4 +4,4 @@ pacman:
   ingress:
     create: true
     class: nginx
-    host: pacman.demo.local
+    host: pacman.dvoc24.v3nc.org
