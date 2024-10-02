@@ -1,5 +1,4 @@
 ---
-# Source: app_of_apps/templates/application.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
