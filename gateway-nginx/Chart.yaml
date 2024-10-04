@@ -1,0 +1,11 @@
+apiVersion: v2
+name: gateway-nginx
+description: gateway-nginx argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: nginx-gateway-fabric
+  version: 1.4.0
+  repository: oci://ghcr.io/nginxinc/charts/
+
