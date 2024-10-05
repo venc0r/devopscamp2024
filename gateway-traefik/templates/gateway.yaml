@@ -9,10 +9,10 @@ spec:
   gatewayClassName: traefik-gatewayclass
   listeners:
     - name: http-listener
-      port: 3800
+      port: 8000
       protocol: HTTP
     - name: https-listener
-      port: 3443
+      port: 8443
       protocol: HTTPS
       hostname: "*.dvoc24.v3nc.org"
       allowedRoutes:
