@@ -1,0 +1,11 @@
+apiVersion: v2
+name: gateway-envoy
+description: gateway-envoy argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: gateway-helm
+  version: v1.1.1
+  repository: oci://docker.io/envoyproxy
+

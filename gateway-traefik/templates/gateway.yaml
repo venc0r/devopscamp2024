@@ -1,0 +1,26 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: traefik-gateway
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-gateway
+spec:
+  gatewayClassName: traefik-gatewayclass
+  listeners:
+    - name: http-listener
+      port: 80
+      protocol: HTTP
+    - name: https-listener
+      port: 443
+      protocol: HTTPS
+      hostname: "*.dvoc24.v3nc.org"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+        - kind: Secret
+          group: ""
+          name: wildcard-dvoc24-v3nc-org-nginx
+        mode: Terminate

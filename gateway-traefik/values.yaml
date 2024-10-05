@@ -1,0 +1,8 @@
+traefik:
+  providers:
+    kubernetesGateway:
+      enabled: true
+    kubernetesCRD:
+      enabled: false
+    kubernetesIngress:
+      enabled: false
