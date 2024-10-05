@@ -1,4 +1,6 @@
 traefik:
+  ingressClass:
+    enabled: false
   gateway:
     enabled: false
   service:
