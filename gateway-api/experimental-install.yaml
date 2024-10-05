@@ -1,6 +1,6 @@
 # source
 # https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
-
+#
 # Copyright 2024 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18234,8 +18234,7 @@ spec:
 
 
 
-                            When the parent resource is a Serv100  939k  100  939k    0     0  1247k      0 --:--:-- --:--:-- --:--:-- 15.5M
-ice, this targets a specific port in the
+                            When the parent resource is a Service, this targets a specific port in the
                             Service spec. When both Port (experimental) and SectionName are specified,
                             the name and port of the selected port must match both specified values.
 
@@ -18319,4 +18318,3 @@ status:
     plural: ""
   conditions: null
   storedVersions: null
-
