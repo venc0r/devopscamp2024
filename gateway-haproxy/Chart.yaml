@@ -1,0 +1,11 @@
+apiVersion: v2
+name: gateway-haproxy
+description: haproxy argocd app chart
+type: application
+version: 0.0.1
+
+dependencies:
+- name: haproxy
+  version: 1.23.0
+  repository: https://haproxytech.github.io/helm-charts
+
