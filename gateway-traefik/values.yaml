@@ -1,4 +1,6 @@
 traefik:
+  gateway:
+    enabled: false
   service:
     enabled: false
   providers:
