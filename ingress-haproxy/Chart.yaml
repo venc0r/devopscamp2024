@@ -5,6 +5,6 @@ type: application
 version: 0.0.1
 
 dependencies:
-- name: haproxy-ingress
-  version: 0.14.7
-  repository: https://haproxy-ingress.github.io/charts
+- name: kubernetes-ingress
+  version: 1.41.0
+  repository: https://haproxytech.github.io/helm-charts
