@@ -9,10 +9,10 @@ spec:
   gatewayClassName: envoy-gatewayclass
   listeners:
     - name: http-listener
-      port: 80
+      port: 2800
       protocol: HTTP
     - name: https-listener
-      port: 443
+      port: 2443
       protocol: HTTPS
       hostname: "*.dvoc24.v3nc.org"
       allowedRoutes:
