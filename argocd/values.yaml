@@ -1,3 +1,4 @@
+targetRevision: ingress
 argo-cd:
   server:
     ingress:

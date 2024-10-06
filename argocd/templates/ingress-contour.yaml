@@ -1,3 +1,4 @@
+{{- if contains "ingress" .Values.targetRevision }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -15,7 +16,9 @@ spec:
   source:
     path: ingress-contour
     repoURL: https://github.com/venc0r/devopscamp2024.git
-    targetRevision: ingress
+    targetRevision: {{ .Values.targetRevision }}
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}

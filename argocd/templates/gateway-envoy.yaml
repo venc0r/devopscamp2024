@@ -1,3 +1,4 @@
+{{- if eq "gateway-envoy" .Values.targetRevision }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -15,9 +16,9 @@ spec:
   source:
     path: gateway-envoy
     repoURL: https://github.com/venc0r/devopscamp2024.git
-    targetRevision: main
+    targetRevision: {{ .Values.targetRevision }}
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-
+{{- end }}
