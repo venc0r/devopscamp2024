@@ -26,7 +26,7 @@ spec:
     kind: Service
     name: argocd-server
   validation:
-    CACertificateRefs:
+    caCertificateRefs:
       - group: ''
         kind: ConfigMap
         name: ca
