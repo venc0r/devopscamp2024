@@ -11,6 +11,9 @@ spec:
     - name: http-listener
       port: 2800
       protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
     - name: https-listener
       port: 2443
       protocol: HTTPS
