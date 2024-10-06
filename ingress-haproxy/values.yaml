@@ -1,9 +1,7 @@
-haproxy-ingress:
+kubernetes-ingress:
   controller:
     service:
-      httpPorts:
-        - port: 18000
-          targetPort: http
-      httpsPorts:
-        - port: 18443
-          targetPort: https
+      type: LoadBalancer
+      ports:
+        http: 18000
+        https: 18443
