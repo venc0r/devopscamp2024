@@ -1,4 +1,4 @@
-targetRevision: gateway-envoy
+targetRevision: gateway-traefik
 argo-cd:
   server:
     certificate:
