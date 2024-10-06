@@ -26,6 +26,9 @@ spec:
     kind: Service
     name: argocd-server
   validation:
-    wellKnownCACertificates: System
+    CACertificateRefs:
+      - group: ''
+        kind: ConfigMap
+        name: ca
     hostname: argocd.dvoc24.v3nc.org
 {{- end }}
