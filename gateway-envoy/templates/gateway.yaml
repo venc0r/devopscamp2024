@@ -9,18 +9,25 @@ spec:
   gatewayClassName: envoy-gatewayclass
   listeners:
     - name: http-listener
-      port: 2800
+      port: 80
       protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
-    - name: https-listener
-      port: 2443
+    - name: argocd-listener
+      port: 443
       protocol: HTTPS
-      hostname: "*.dvoc24.v3nc.org"
+      hostname: "argocd.dvoc24.v3nc.org"
       allowedRoutes:
         namespaces:
-          from: All
+          from: argocd
+    - name: pacman-listener
+      port: 443
+      protocol: HTTPS
+      hostname: "pacman.dvoc24.v3nc.org"
+      allowedRoutes:
+        namespaces:
+          from: pacman
       tls:
         certificateRefs:
         - kind: Secret
