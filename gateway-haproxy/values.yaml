@@ -1,4 +1,4 @@
-haproxy:
+kubernetes-ingress:
   controller:
     kubernetesGateway:
       enabled: true
