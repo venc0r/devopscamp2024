@@ -1,4 +1,4 @@
-targetRevision: gateway-haproxy
+targetRevision: gateway-nginx
 argo-cd:
   server:
     certificate:
