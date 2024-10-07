@@ -1,4 +1,4 @@
-targetRevision: gateway-traefik
+targetRevision: gateway-haproxy
 argo-cd:
   server:
     certificate:
