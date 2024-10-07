@@ -30,5 +30,5 @@ spec:
       - group: ''
         kind: ConfigMap
         name: ca
-    hostname: 10.42.0.99 # argocd.dvoc24.v3nc.org
+    hostname: 10.43.55.210 # argocd.dvoc24.v3nc.org
 {{- end }}
