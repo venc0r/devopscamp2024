@@ -1,7 +1,7 @@
 {{- if contains "gateway" .Values.targetRevision }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+kind: TLSRoute
 metadata:
   name: argocd-server
 spec:
