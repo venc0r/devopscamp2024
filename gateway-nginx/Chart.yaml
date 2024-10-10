@@ -1,6 +1,6 @@
 apiVersion: v2
 name: gateway-nginx
-description: gateway-nginx argocd app chart
+description: nginx argocd app chart
 type: application
 version: 0.0.1
 
