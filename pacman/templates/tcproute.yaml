@@ -1,0 +1,14 @@
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: pacman.dvoc24.v3nc.org
+spec:
+  parentRefs:
+    - name: gateway
+      namespace: gateway-haproxy
+  rules:
+    - backendRefs:
+        - name: pacman
+          port: 80
+

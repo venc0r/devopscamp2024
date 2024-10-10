@@ -3,9 +3,11 @@ kubernetes-ingress:
     kubernetesGateway:
       enabled: true
       gatewayControllerName: haproxy.org/gateway-controller
+
     service:
+      type: LoadBalancer
       tcpPorts:
-        - name: listener1
+        - name: pacmantcp
           protocol: TCP
-          port: 8000
-          targetPort: 8000
+          port: 8080
+          targetPort: 80
