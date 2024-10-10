@@ -1,4 +1,4 @@
-targetRevision: ingress
+targetRevision: gateway-envoy
 argo-cd:
   server:
     certificate:
