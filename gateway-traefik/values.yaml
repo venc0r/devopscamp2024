@@ -1,12 +1,4 @@
 traefik:
-
-  logs:
-    general:
-      level: "DEBUG"  # @schema enum:[INFO,WARN,ERROR,FATAL,PANIC,DEBUG]; default: "INFO"
-    access:
-      enabled: true
-      retryattempts: false
-
   gateway:
     enabled: true
     name: gateway
@@ -43,3 +35,10 @@ traefik:
   providers:
     kubernetesGateway:
       enabled: true
+
+  logs:
+    general:
+      level: "DEBUG"
+    access:
+      enabled: true
+      retryattempts: false
