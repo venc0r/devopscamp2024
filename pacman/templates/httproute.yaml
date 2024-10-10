@@ -5,7 +5,7 @@ metadata:
   name: pacman.dvoc24.v3nc.org
 spec:
   parentRefs:
-    - name: envoy-gateway
+    - name: gateway
       namespace: gateway-envoy
   hostnames:
     - pacman.dvoc24.v3nc.org
