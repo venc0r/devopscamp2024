@@ -224,7 +224,7 @@ Install pacman
 
 # pacman is accessible through contour
 ```bash
-❯ curl http://pacman.dvoc24.v3nc.org:28000
+❯ curl http://pacman.dvoc24.v3nc.org:38000
 ```
 
 <!-- end_slide -->
@@ -315,18 +315,23 @@ Install Envoy Gateway
 > targetRevision: gateway-envoy
 ```
 
+# Enabled cert-manager gateway-api support
+```bash
+❯ argocd app sync cert-manager --core
+```
+
+<!-- pause -->
 # Removing ingress controllers apps and deploy gateway-envoy application
 ```bash
 ❯ argocd app sync argocd --core --prune
 ❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-envoy"
+❯ argocd app sync gateway-envoy --core
 ```
 
 # Switch to the gateway-haproxy branch
 ```bash
 ❯ git checkout gateway-envoy
 ```
-### Pacman is accessible through http and https
-
 
 # argocd needs a BackendTLSPolicy to allow https backend traffic
 ```yaml
@@ -347,7 +352,6 @@ spec:
         name: ca
     hostname: argocd.dvoc24.v3nc.org
 ```
-Cert-Manager must enable its gateway-api feature.
 
 <!-- end_slide -->
 Install Traefik (v3) with gateway-api. (helm chart >v28.0.0)
