@@ -1,14 +1,4 @@
-targetRevision: gateway-traefik
 argo-cd:
-  server:
-    certificate:
-      enabled: true
-      domain: argocd.dvoc24.v3nc.org
-      issuer:
-        group: cert-manager.io
-        kind: ClusterIssuer
-        name: letsencrypt-gateway
-
     ingress:
       enabled: true
       https: false
@@ -21,3 +11,12 @@ argo-cd:
         - secretName: argocd-cert
           hosts:
             - argocd.dvoc24.v3nc.org
+  # server:
+  #   certificate:
+  #     enabled: true
+  #     domain: argocd.dvoc24.v3nc.org
+  #     issuer:
+  #       group: cert-manager.io
+  #       kind: ClusterIssuer
+  #       name: letsencrypt-gateway
+
