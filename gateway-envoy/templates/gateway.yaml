@@ -20,7 +20,7 @@ spec:
       hostname: "argocd.dvoc24.v3nc.org"
       allowedRoutes:
         namespaces:
-          from: argocd
+          from: All
       tls:
         certificateRefs:
         - kind: Secret
@@ -32,7 +32,7 @@ spec:
       hostname: "pacman.dvoc24.v3nc.org"
       allowedRoutes:
         namespaces:
-          from: pacman
+          from: All
       tls:
         certificateRefs:
         - kind: Secret

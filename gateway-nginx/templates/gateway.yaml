@@ -2,7 +2,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: nginx-gateway
+  name: gateway
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-gateway
 spec:
@@ -11,10 +11,19 @@ spec:
     - name: http-listener
       port: 80
       protocol: HTTP
-    - name: https-listener
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: http-listener2
+      port: 8080
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: argocd-listener
       port: 443
       protocol: HTTPS
-      hostname: "*.dvoc24.v3nc.org"
+      hostname: "argocd.dvoc24.v3nc.org"
       allowedRoutes:
         namespaces:
           from: All
@@ -22,5 +31,17 @@ spec:
         certificateRefs:
         - kind: Secret
           group: ""
-          name: wildcard-dvoc24-v3nc-org-nginx
+          name: argocd-dvoc24-v3nc-org
+    - name: pacman-listener
+      port: 443
+      protocol: HTTPS
+      hostname: "pacman.dvoc24.v3nc.org"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+        - kind: Secret
+          group: ""
+          name: pacman-dvoc24-v3nc-org
         mode: Terminate

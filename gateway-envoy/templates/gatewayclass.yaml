@@ -10,4 +10,3 @@ spec:
     kind: EnvoyProxy
     name: envoy-config
     namespace: gateway-envoy
-
