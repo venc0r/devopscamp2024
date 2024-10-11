@@ -365,18 +365,12 @@ Install Traefik (v3) with gateway-api. (helm chart >v28.0.0)
 Install haproxy with gateway-api
 ===
 
-# Change the targetRevision in the argocd/values.yaml
-```diff
-< targetRevision: gateway-traefik
-> targetRevision: gateway-haproxy
-```
-
 # Removing traefik and CRDs. Create haproxy application, haproxy requires an old CRD version.
 ```bash
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-traefik"
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-haproxy"
+❯ argocd app delete gateway-traefik --core -y
 ❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
 ❯ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
+❯ argocd app sync gateway-haproxy --core --retry-limit 3
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
