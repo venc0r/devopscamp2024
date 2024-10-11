@@ -7,7 +7,7 @@ metadata:
 spec:
   parentRefs:
     - name: gateway
-      namespace: gateway-nginx
+      namespace: gateway-envoy
   hostnames:
     - argocd.dvoc24.v3nc.org
   rules:
