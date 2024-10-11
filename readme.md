@@ -370,7 +370,6 @@ Install haproxy with gateway-api
 ❯ argocd app delete gateway-traefik --core -y
 ❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
 ❯ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
-❯ argocd app sync gateway-haproxy --core --retry-limit 3
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
@@ -392,7 +391,7 @@ rolebinding.rbac.authorization.k8s.io/gateway-api-admission created
 job.batch/gateway-api-admission created
 job.batch/gateway-api-admission-patch created
 
-❯ argocd app sync gateway-haproxy --core
+❯ argocd app sync gateway-haproxy --core --retry-limit 3
 ```
 
 ## Old crds are used
@@ -403,11 +402,9 @@ job.batch/gateway-api-admission-patch created
 Install nginx gateway fabric
 ===
 
-# Change the targetRevision in the argocd/values.yaml
-```diff
-< targetRevision: gateway-haproxy
-> targetRevision: gateway-nginx
-```
+# Change httproutes to gateway-traefik parentRef
+- argocd/templates/httproute.yaml
+- pacman/templates/httproute.yaml
 
 # Removing traefik-gateway and CRDs. Create gateway-traefik application, haproxy requires an old CRD version.
 ```bash
