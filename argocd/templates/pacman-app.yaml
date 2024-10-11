@@ -15,7 +15,7 @@ spec:
   source:
     path: pacman
     repoURL: https://github.com/venc0r/devopscamp2024.git
-    targetRevision: {{ .Values.targetRevision }}
+    targetRevision: main
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
