@@ -7,30 +7,11 @@ metadata:
 spec:
   parentRefs:
     - name: gateway
-      namespace: gateway-envoy
+      namespace: gateway-traefik
   hostnames:
     - argocd.dvoc24.v3nc.org
   rules:
     - backendRefs:
         - name: argocd-server
           port: 443
-{{- end }}
-
-{{- if .Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1alpha3" }}
----
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: BackendTLSPolicy
-metadata:
-  name: argocd-server
-spec:
-  targetRefs:
-  - group: ''
-    kind: Service
-    name: argocd-server
-  validation:
-    caCertificateRefs:
-      - group: ''
-        kind: ConfigMap
-        name: ca
-    hostname: argocd.dvoc24.v3nc.org
 {{- end }}

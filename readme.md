@@ -323,52 +323,39 @@ cert-manager/values.yaml
 ❯ argocd app delete ingress-nginx --core -y
 ❯ argocd app sync argocd --core --resource "argoproj.io:Application:gateway-envoy"
 ❯ argocd app sync gateway-envoy --core
+❯ argocd app sync pacman --core
 ```
 
 <!-- pause -->
 
-# argocd needs a BackendTLSPolicy to allow https backend traffic
+# Argocd needs a BackendTLSPolicy to allow https backend traffic
 ```bash
-❯ kubectl create cm ca --from-literal="ca.crt=$(openssl s_client -showcerts -verify 5 -connect argocd.dvoc24.v3nc.org:443 < /dev/null)"
+❯ openssl s_client -showcerts -verify 5 -connect localhost:8443 < /dev/null | tail -n81 | head -n31 > ca.crt
+❯ kubectl create cm ca --from-file ca.crt
+❯ kubectl get pods -n gateway-envoy | grep -v NAME | awk '{print $1}' | xargs kubectl delete pod -n gateway-envoy
 ```
-
-```yaml
----
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: BackendTLSPolicy
-metadata:
-  name: argocd-server
-spec:
-  targetRefs:
-  - group: ''
-    kind: Service
-    name: argocd-server
-  validation:
-    caCertificateRefs:
-      - group: ''
-        kind: ConfigMap
-        name: ca
-    hostname: argocd.dvoc24.v3nc.org
-```
-
+argocd/templates/backendtlspolicy.yaml
 
 <!-- end_slide -->
+
 Install Traefik (v3) with gateway-api. (helm chart >v28.0.0)
 ===
 
-# Change the targetRevision in the argocd/values.yaml
-```diff
-< targetRevision: gateway-envoy
-> targetRevision: gateway-traefik
+# Removing envoy and CRDs.
+```bash
+❯ kubectl delete gateway -n gateway-envoy gateway
+❯ argocd app delete gateway-envoy --core -y
+❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
 ```
 
-# Removing envoy and CRDs. Create traefik application
+# Create traefik application
 ```bash
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-envoy"
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-traefik"
-❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
-❯ argocd app sync gateway-traefik --core
+❯ argocd app sync gateway-traefik --core --retry-limit 3
 ```
+
+# Change httproutes to gateway-traefik parentRef
+- argocd/templates/httproute.yaml
+- pacman/templates/httproute.yaml
 
 ## Gateway and GatewayClass through helm values
 ## LoadBalancer SVC is created from helm chart
