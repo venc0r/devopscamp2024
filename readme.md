@@ -130,7 +130,7 @@ Forwarding from [::1]:8443 -> 8080
 
 # With the argocd cli the `--core` flag uses the k8s-api
 ```bash
-❯ argocd app sync argocd --core
+❯ argocd app sync argocd --core --retry-limit 3
 
 TIMESTAMP                  GROUP              KIND                            NAMESPACE
 2024-10-04T19:56:16+02:00                     ConfigMap                       argocd
@@ -141,17 +141,17 @@ argoproj.io  Application  argocd     argocd         Synced                applic
 argoproj.io  Application  argocd     ingress-nginx  Synced                application.ar...
 ```
 
+# Cert manager for automatic tls certificate generation from Let's Encrypt.
+```bash
+❯ argocd app sync cert-manager --core --retry-limit 3
+```
+
 <!-- end_slide -->
 Sync the applications
 ===
-# Cert manager for automatic tls certificate generation from Let's Encrypt.
-```bash
-❯ argocd app sync cert-manager --core
-```
-
 # Install the NGINX Ingress Controller
 ```bash
-❯ argocd app sync ingress-nginx --core
+❯ argocd app sync ingress-nginx --core --retry-limit 3
 ❯ kubectl get svc -n ingress-nginx
 
 NAME                     TYPE          CLUSTER-IP    EXTERNAL-IP    PORT(S)
@@ -161,7 +161,7 @@ ingress-nginx-controller LoadBalancer  10.43.187.48  213.95.48.135  80:31742/TCP
 <!-- pause -->
 # Ingress controller implementation for HAProxy LoadBalancer
 ```bash
-❯ argocd app sync ingress-haproxy --core
+❯ argocd app sync ingress-haproxy --core --retry-limit 3
 ❯ kubectl get svc -n ingress-haproxy
 
 NAME                               TYPE         CLUSTER-IP    EXTERNAL-IP   PORT(S)
@@ -173,7 +173,7 @@ Sync the applications
 ===
 # Contour is an ingress controller for Kubernetes that works by deploying the Envoy proxy
 ```bash
-❯ argocd app sync ingress-contour --core
+❯ argocd app sync ingress-contour --core --retry-limit 3
 ❯ kubectl get svc -n ingress-contour
 
 NAME                  TYPE         CLUSTER-IP    EXTERNAL-IP   PORT(S)
@@ -197,13 +197,13 @@ Access through ingress
 
 # Check Loadbalancer Services
 ```bash
-❯ kubectl get svc -A | grep Loadbalancer
+❯ kubectl get svc -A | grep LoadBalancer
 
-NAME                        TYPE CLUSTER-IP     EXTERNAL-IP    PORT(S)
-ing-nginx-controller        LB   10.43.187.48   213.95.48.135  80:31742/TCP,443:32358/TCP
-ing-haproxy-haproxy-ingress LB   10.43.168.250  213.95.48.135  18000:30512/TCP,18443:32390/TCP
-ing-contour-envoy           LB   10.43.245.106  213.95.48.135  28000:32451/TCP,28443:30234/TCP
-ing-traefik                 LB   10.43.221.155  213.95.48.135  38000:30269/TCP,38443:31270/TCP
+NAMESPACE         NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)
+ingress-contour   ingress-contour-envoy                LoadBalancer   10.43.116.22    213.95.48.135   28000:32016/TCP,28443:30518/TCP
+ingress-haproxy   ingress-haproxy-kubernetes-ingress   LoadBalancer   10.43.110.129   213.95.48.135   18000:30817/TCP,18443:30301/TCP,18443:30301/UDP,1024:30854/TCP...
+ingress-nginx     ingress-nginx-controller             LoadBalancer   10.43.20.250    213.95.48.135   80:30781/TCP,443:32149/TCP
+ingress-traefik   ingress-traefik                      LoadBalancer   10.43.248.61    213.95.48.135   38000:30124/TCP,38443:30284/TCP
 ```
 
 # Check the different values.yaml for each ingress-controller
@@ -217,28 +217,22 @@ ingress-traefik/values.yaml
 
 Install pacman
 ===
+# sync pacman argocd application with values pacman/values.yaml
 
 ```bash
-❯ argocd app sync pacman --core
+❯ argocd app sync pacman --core --retry-limit 3
 ```
-
-# pacman is accessible through contour
-```bash
-❯ curl http://pacman.dvoc24.v3nc.org:38000
-```
-
-<!-- end_slide -->
-Install pacman
-===
 
 # Check ingress
 ```bash
-❯ kubectl get ingress -A
+❯ kubectl get ingress -n pacman
 
 NAMESPACE   NAME             CLASS    HOSTS                    ADDRESS         PORTS     AGE
-argocd      argocd-server    nginx    argocd.dvoc24.v3nc.org   213.95.48.135   80, 443   23h
-pacman      pacman-ingress   <none>   pacman.dvoc24.v3nc.org   213.95.48.135   80, 443   23h
+argocd      argocd-server    nginx    argocd.dvoc24.v3nc.org                   80, 443   23h
+pacman      pacman-ingress   ?        pacman.dvoc24.v3nc.org                   80, 443   23h
 ```
+
+<!-- pause -->
 
 # Check ingressClasses
 ```bash
@@ -249,6 +243,12 @@ contour           projectcontour.io/ingress-contour/ingress-contour-contour   <n
 haproxy           haproxy.org/ingress-controller/haproxy                      <none>
 ingress-traefik   traefik.io/ingress-controller                               <none>
 nginx             k8s.io/ingress-nginx                                        <none>
+```
+
+# pacman is accessible
+```bash
+❯ curl http://pacman.dvoc24.v3nc.org:38000
+❯ curl https://pacman.dvoc24.v3nc.org:38443
 ```
 
 <!-- end_slide -->
@@ -309,31 +309,29 @@ customresourcedefinition.apiextensions.k8s.io/udproutes.gateway.networking.k8s.i
 Install Envoy Gateway
 ===
 
-# Change the targetRevision in the argocd/values.yaml
-```diff
-< targetRevision: ingress
-> targetRevision: gateway-envoy
-```
-
 # Enabled cert-manager gateway-api support
+cert-manager/values.yaml
 ```bash
-❯ argocd app sync cert-manager --core
+❯ argocd app sync cert-manager --core --retry-limit 3
 ```
 
-<!-- pause -->
 # Removing ingress controllers apps and deploy gateway-envoy application
 ```bash
-❯ argocd app sync argocd --core --prune
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-envoy"
+❯ argocd app delete ingress-traefik --core -y
+❯ argocd app delete ingress-haproxy --core -y
+❯ argocd app delete ingress-contour --core -y
+❯ argocd app delete ingress-nginx --core -y
+❯ argocd app sync argocd --core --resource "argoproj.io:Application:gateway-envoy"
 ❯ argocd app sync gateway-envoy --core
 ```
 
-# Switch to the gateway-haproxy branch
-```bash
-❯ git checkout gateway-envoy
-```
+<!-- pause -->
 
 # argocd needs a BackendTLSPolicy to allow https backend traffic
+```bash
+❯ kubectl create cm ca --from-literal="ca.crt=$(openssl s_client -showcerts -verify 5 -connect argocd.dvoc24.v3nc.org:443 < /dev/null)"
+```
+
 ```yaml
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
@@ -352,6 +350,7 @@ spec:
         name: ca
     hostname: argocd.dvoc24.v3nc.org
 ```
+
 
 <!-- end_slide -->
 Install Traefik (v3) with gateway-api. (helm chart >v28.0.0)
