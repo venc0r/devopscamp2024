@@ -402,13 +402,9 @@ job.batch/gateway-api-admission-patch created
 Install nginx gateway fabric
 ===
 
-# Change httproutes to gateway-traefik parentRef
-- argocd/templates/httproute.yaml
-- pacman/templates/httproute.yaml
-
 # Removing traefik-gateway and CRDs. Create gateway-traefik application, haproxy requires an old CRD version.
 ```bash
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-haproxy"
+❯ argocd app delete gateway-haproxy --core -y
 ❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
 ```
 
@@ -443,8 +439,12 @@ Install nginx gateway fabric
 
 # Sync argocd to deploy gateway-nginx
 ```bash
-❯ argocd app sync argocd --core --prune --resource "argoproj.io:Application:gateway-nginx"
+❯ argocd app sync gateway-nginx --core --retry-limit 3
 ```
+
+# Change httproutes to gateway-traefik parentRef
+- argocd/templates/httproute.yaml
+- pacman/templates/httproute.yaml
 
 ## GatewayClass from helm chart
 ## LoadBalancer SVC from values
