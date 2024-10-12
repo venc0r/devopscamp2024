@@ -1,12 +1,12 @@
 argo-cd:
   server:
-    certificate:
-      enabled: true
-      domain: argocd.dvoc24.v3nc.org
-      issuer:
-        group: cert-manager.io
-        kind: ClusterIssuer
-        name: letsencrypt-gateway
+    # certificate:
+    #   enabled: true
+    #   domain: argocd.dvoc24.v3nc.org
+    #   issuer:
+    #     group: cert-manager.io
+    #     kind: ClusterIssuer
+    #     name: letsencrypt-gateway
     ingress:
       enabled: true
       https: false
