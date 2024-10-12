@@ -1,6 +1,6 @@
 ---
 title: DEVOPS-Camp 2024 -- kubernetes ingress vs. gateway-api
-author: venc0r
+author: venc0r (Jörg)
 theme:
   name: mytheme
 ---
@@ -287,9 +287,7 @@ customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking
 ❯ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io configured
-customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io configured
-customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io configured
-customresourcedefinition.apiextensions.k8s.io/httproutes.gateway.networking.k8s.io configured
+...
 customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io configured
 
 customresourcedefinition.apiextensions.k8s.io/backendlbpolicies.gateway.networking.k8s.io created
@@ -321,9 +319,8 @@ cert-manager/values.yaml
 ❯ argocd app delete ingress-haproxy --core -y
 ❯ argocd app delete ingress-contour --core -y
 ❯ argocd app delete ingress-nginx --core -y
-❯ argocd app sync argocd --core --resource "argoproj.io:Application:gateway-envoy"
-❯ argocd app sync gateway-envoy --core
-❯ argocd app sync pacman --core
+❯ argocd app sync gateway-envoy --core --retry-limit 3
+❯ argocd app sync pacman --core --retry-limit 3
 ```
 
 <!-- pause -->
