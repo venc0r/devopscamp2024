@@ -11,12 +11,12 @@ argo-cd:
       enabled: true
       https: false
       ingressClassName: nginx
-      hostname: argocd.dvoc24.v3nc.org
+      hostname: argocd.demo.v3nc.org
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         cert-manager.io/cluster-issuer: letsencrypt-nginx
       extraTls:
         - secretName: argocd-cert
           hosts:
-            - argocd.dvoc24.v3nc.org
+            - argocd.demo.v3nc.org
 
