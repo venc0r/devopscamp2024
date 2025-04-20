@@ -2,21 +2,21 @@ argo-cd:
   server:
     # certificate:
     #   enabled: true
-    #   domain: argocd.dvoc24.v3nc.org
+    #   domain: argocd.demo
     #   issuer:
     #     group: cert-manager.io
     #     kind: ClusterIssuer
-    #     name: letsencrypt-gateway
+    #     name: selfsigned-issuer
     ingress:
       enabled: false
       https: false
       ingressClassName: nginx
-      hostname: argocd.demo.v3nc.org
+      hostname: argocd.demo
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-        cert-manager.io/cluster-issuer: self-signed
+        cert-manager.io/cluster-issuer: selfsigned-issuer
       extraTls:
         - secretName: argocd-cert
           hosts:
-            - argocd.demo.v3nc.org
+            - argocd.demo
 

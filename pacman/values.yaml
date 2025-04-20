@@ -1,7 +1,7 @@
 pacman:
   ingress:
     create: true
-    host: pacman.demo.v3nc.org
+    host: pacman.demo
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-issuer
     tls:
