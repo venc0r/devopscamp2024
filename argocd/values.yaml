@@ -8,13 +8,13 @@ argo-cd:
     #     kind: ClusterIssuer
     #     name: letsencrypt-gateway
     ingress:
-      enabled: true
+      enabled: false
       https: false
       ingressClassName: nginx
       hostname: argocd.demo.v3nc.org
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-        cert-manager.io/cluster-issuer: letsencrypt-nginx
+        cert-manager.io/cluster-issuer: self-signed
       extraTls:
         - secretName: argocd-cert
           hosts:
