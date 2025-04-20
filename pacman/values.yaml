@@ -3,7 +3,7 @@ pacman:
     create: true
     host: pacman.demo.v3nc.org
     annotations:
-      cert-manager.io/cluster-issuer: self-signed
+      cert-manager.io/cluster-issuer: selfsigned-issuer
     tls:
       enabled: true
       secretName: pacman-cert
