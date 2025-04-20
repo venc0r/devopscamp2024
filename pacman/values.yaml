@@ -1,9 +1,9 @@
 pacman:
   ingress:
     create: true
-    host: pacman.dvoc24.v3nc.org
+    host: pacman.demo.v3nc.org
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-nginx
+      cert-manager.io/cluster-issuer: self-signed
     tls:
       enabled: true
       secretName: pacman-cert
