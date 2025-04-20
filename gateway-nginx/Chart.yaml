@@ -7,4 +7,4 @@ version: 0.0.1
 dependencies:
 - name: nginx-gateway-fabric
   version: 1.6.2
-  repository: oci://ghcr.io/nginx/charts/nginx-gateway-fabric
+  repository: oci://ghcr.io/nginx/charts
