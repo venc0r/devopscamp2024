@@ -10,23 +10,20 @@ Install k3s without ingress
 
 # Installing a simple kubernetes cluster based on k3s
 ```bash
-❯ export INSTALL_K3S_EXEC="\
-        --disable=traefik \
-        --tls-san=dvoc24.v3nc.org \
-        --node-external-ip=213.95.48.135"
+❯ minikube start -d kvm2 --cni=cilium --container-runtime=cri-o --cpu='4'
+❯ minikube addons install metallb
+❯ minikube addons configure metallb
 
-❯ curl -sfL https://get.k3s.io | sh -
+-- Enter Load Balancer Start IP: 192.168.39.100
+-- Enter Load Balancer End IP: 192.168.39.200
 ```
-
-# The kubeconfig to access the cluster is located at
-`/etc/rancher/k3s/k3s.yaml`
 
 # Check the cluster access
 ```bash
 ❯ kubectl get nodes
 
-NAME     STATUS   ROLES                  AGE   VERSION
-dvoc24   Ready    control-plane,master   19h   v1.30.5+k3s1
+NAME       STATUS   ROLES           AGE     VERSION   INTERNAL-IP     EXTERNAL-IP
+minikube   Ready    control-plane   2d22h   v1.32.0   192.168.39.50   <none>
 ```
 
 <!-- end_slide -->
@@ -116,13 +113,14 @@ Access argocd with the created initial admin password and local portforwarding
 
 # To access argocd through the browser
 ```bash
-❯ kubectl port-forward svc/argocd-server 8443:443
+❯ kubectl port-forward -n argocd svc/argocd-server 8443:443 &!
 
 Forwarding from 127.0.0.1:8443 -> 8080
 Forwarding from [::1]:8443 -> 8080
 ```
 
 ```bash
+❯ helm template argocd --namespace argocd --include-crds argocd | kubectl apply -n argocd -f -
 ❯ kubectl get secrets argocd-initial-admin-secret -o json | jq '.data.password' -r | base64 -d
 
 <redacted>
@@ -155,20 +153,10 @@ Sync the applications
 ❯ kubectl get svc -n ingress-nginx
 
 NAME                     TYPE          CLUSTER-IP    EXTERNAL-IP    PORT(S)
-ingress-nginx-controller LoadBalancer  10.43.187.48  213.95.48.135  80:31742/TCP,443:32358/TCP
+ingress-nginx-controller LoadBalancer  10.110.60.161 192.168.39.100 80:32541/TCP,443:32572/TCP
 ```
 
 <!-- pause -->
-# Ingress controller implementation for HAProxy LoadBalancer
-```bash
-❯ argocd app sync ingress-haproxy --core --retry-limit 3
-❯ kubectl get svc -n ingress-haproxy
-
-NAME                               TYPE         CLUSTER-IP    EXTERNAL-IP   PORT(S)
-ingress-haproxy-kubernetes-ingress LoadBalancer 10.43.164.147 213.95.48.135 18000:30132/TCP,18443:30199/TCP,18443:30199/UDP,1024:32020/TCP,6060:32409/TCP
-```
-
-<!-- end_slide -->
 Sync the applications
 ===
 # Contour is an ingress controller for Kubernetes that works by deploying the Envoy proxy
@@ -176,8 +164,18 @@ Sync the applications
 ❯ argocd app sync ingress-contour --core --retry-limit 3
 ❯ kubectl get svc -n ingress-contour
 
-NAME                  TYPE         CLUSTER-IP    EXTERNAL-IP   PORT(S)
-ingress-contour-envoy LoadBalancer 10.43.245.106 213.95.48.135 28000:32451/TCP,28443:30234/TCP
+NAME                  TYPE         CLUSTER-IP    EXTERNAL-IP    PORT(S)
+ingress-contour-envoy LoadBalancer 10.104.17.65  192.168.39.101 80:30407/TCP,443:32495/TCP
+```
+
+<!-- end_slide -->
+# Ingress controller implementation for HAProxy LoadBalancer
+```bash
+❯ argocd app sync ingress-haproxy --core --retry-limit 3
+❯ kubectl get svc -n ingress-haproxy
+
+NAME                               TYPE         CLUSTER-IP     EXTERNAL-IP    PORT(S)
+ingress-haproxy-kubernetes-ingress LoadBalancer 10.103.220.236 192.168.39.102 80:30873/TCP,443:31417/TCP,443:31417/UDP,1024:31518/TCP
 ```
 
 <!-- pause -->
@@ -187,7 +185,7 @@ ingress-contour-envoy LoadBalancer 10.43.245.106 213.95.48.135 28000:32451/TCP,2
 ❯ kubectl get svc -n ingress-traefik
 
 NAME             TYPE          CLUSTER-IP     EXTERNAL-IP    PORT(S)
-ingress-traefik  LoadBalancer  10.43.221.155  213.95.48.135  38000:30269/TCP,38443:31270/TCP
+ingress-traefik  LoadBalancer  10.98.186.233  192.168.39.103 80:30607/TCP,443:32543/TCP
 ```
 
 
@@ -199,11 +197,11 @@ Access through ingress
 ```bash
 ❯ kubectl get svc -A | grep LoadBalancer
 
-NAMESPACE         NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)
-ingress-contour   ingress-contour-envoy                LoadBalancer   10.43.116.22    213.95.48.135   28000:32016/TCP,28443:30518/TCP
-ingress-haproxy   ingress-haproxy-kubernetes-ingress   LoadBalancer   10.43.110.129   213.95.48.135   18000:30817/TCP,18443:30301/TCP,18443:30301/UDP,1024:30854/TCP...
-ingress-nginx     ingress-nginx-controller             LoadBalancer   10.43.20.250    213.95.48.135   80:30781/TCP,443:32149/TCP
-ingress-traefik   ingress-traefik                      LoadBalancer   10.43.248.61    213.95.48.135   38000:30124/TCP,38443:30284/TCP
+NAMESPACE         NAME                                 TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)
+ingress-nginx     ingress-nginx-controller             LoadBalancer   10.110.60.161    192.168.39.100   80:32541/TCP,443:32572/TCP                                16h
+ingress-contour   ingress-contour-envoy                LoadBalancer   10.104.17.65     192.168.39.101   80:30407/TCP,443:32495/TCP                                15h
+ingress-haproxy   ingress-haproxy-kubernetes-ingress   LoadBalancer   10.103.220.236   192.168.39.102   80:30873/TCP,443:31417/TCP,443:31417/UDP,1024:31518/TCP   15h
+ingress-traefik   ingress-traefik                      LoadBalancer   10.98.186.233    192.168.39.103   80:30607/TCP,443:32543/TCP                                14h
 ```
 
 # Check the different values.yaml for each ingress-controller
@@ -227,16 +225,20 @@ Install pacman
 ```bash
 ❯ kubectl get ingress -n pacman
 
-NAMESPACE   NAME             CLASS    HOSTS                    ADDRESS         PORTS     AGE
-argocd      argocd-server    nginx    argocd.dvoc24.v3nc.org                   80, 443   23h
-pacman      pacman-ingress   ?        pacman.dvoc24.v3nc.org                   80, 443   23h
+NAMESPACE   NAME             CLASS    HOSTS         ADDRESS         PORTS     AGE
+argocd      argocd-server    nginx    argocd.demo                   80, 443   23h
+pacman      pacman-ingress   ?        pacman.demo                   80, 443   23h
 ```
 
 <!-- pause -->
 
 # Check ingressClasses
 ```bash
-❯ kubectl get ingressclass
+
+❯ kubectl get ingressclass -o custom-columns=\
+NAME:metadata.name,\
+CONTROLLER:.spec.controller,\
+DEFAULT:".metadata.annotations.ingressclass\.kubernetes\.io/is-default-class"
 
 NAME              CONTROLLER                                                  PARAMETERS
 contour           projectcontour.io/ingress-contour/ingress-contour-contour   <none>
@@ -247,8 +249,10 @@ nginx             k8s.io/ingress-nginx                                        <n
 
 # pacman is accessible
 ```bash
-❯ curl http://pacman.dvoc24.v3nc.org:38000
-❯ curl https://pacman.dvoc24.v3nc.org:38443
+❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.100 -k
+❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.101 -k
+❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.102 -k
+❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.103 -k
 ```
 
 <!-- end_slide -->
@@ -266,7 +270,7 @@ Switch from ingress to gateway-api
 
 # Install the gateway-api crds
 ```bash
-❯ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
+❯ kubectl apply -f gateway-api/standard-install.yaml
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
@@ -284,7 +288,7 @@ customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking
 <!-- pause -->
 # Experimental vs. Standard crd
 ```bash
-❯ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+❯ kubectl apply -f gateway-api/experimental-install.yaml
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io configured
 ...
