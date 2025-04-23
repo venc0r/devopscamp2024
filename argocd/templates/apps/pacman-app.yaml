@@ -18,6 +18,17 @@ spec:
     path: pacman
     repoURL: https://github.com/venc0r/devopscamp2024.git
     targetRevision: main
+    helm:
+      values: |
+        pacman:
+          ingress:
+            create: true
+            host: pacman.demo
+            annotations:
+              cert-manager.io/cluster-issuer: selfsigned-issuer
+            tls:
+              enabled: true
+              secretName: pacman-cert
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

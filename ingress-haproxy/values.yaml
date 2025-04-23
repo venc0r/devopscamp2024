@@ -1,4 +1,0 @@
-kubernetes-ingress:
-  controller:
-    service:
-      type: LoadBalancer

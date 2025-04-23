@@ -18,6 +18,23 @@ spec:
     path: gateway-nginx
     repoURL: https://github.com/venc0r/devopscamp2024.git
     targetRevision: main
+    helm:
+      values: |
+        nginx-gateway-fabric:
+          service:
+            ports:
+              - name: http
+                port: 80
+                protocol: TCP
+                targetPort: 80
+            - name: https
+              port: 443
+              protocol: TCP
+              targetPort: 443
+            - name: http2
+              port: 8080
+              protocol: TCP
+              targetPort: 8080
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

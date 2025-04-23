@@ -18,6 +18,12 @@ spec:
     path: ingress-haproxy
     repoURL: https://github.com/venc0r/devopscamp2024.git
     targetRevision: main
+    helm:
+      values: |
+        kubernetes-ingress:
+          controller:
+            service:
+              type: LoadBalancer
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

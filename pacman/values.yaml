@@ -1,9 +1,0 @@
-pacman:
-  ingress:
-    create: true
-    host: pacman.demo
-    annotations:
-      cert-manager.io/cluster-issuer: selfsigned-issuer
-    tls:
-      enabled: true
-      secretName: pacman-cert

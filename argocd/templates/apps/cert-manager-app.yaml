@@ -18,10 +18,15 @@ spec:
     path: cert-manager
     repoURL: https://github.com/venc0r/devopscamp2024.git
     targetRevision: main
+    helm:
+      values: |
+        cert-manager:
+          installCRDs: true
+          # config:
+          #   apiVersion: "controller.config.cert-manager.io/v1alpha1"
+          #   kind: "ControllerConfiguration"
+          #   enableGatewayAPI: true
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true

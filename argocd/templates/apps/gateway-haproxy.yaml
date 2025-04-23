@@ -18,6 +18,20 @@ spec:
     path: gateway-haproxy
     repoURL: https://github.com/venc0r/devopscamp2024.git
     targetRevision: main
+    helm:
+      values: |
+        kubernetes-ingress:
+          controller:
+            kubernetesGateway:
+              enabled: true
+              gatewayControllerName: haproxy.org/gateway-controller
+            service:
+              type: LoadBalancer
+              tcpPorts:
+                - name: pacmantcp
+                  protocol: TCP
+                  port: 8080
+                  targetPort: 80
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
