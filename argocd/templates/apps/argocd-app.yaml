@@ -22,20 +22,10 @@ spec:
       values: |
         argo-cd:
           server:
-            certificate:
-              enabled: false
-              domain: argocd.demo
-              issuer:
-                group: cert-manager.io
-                kind: ClusterIssuer
-                name: selfsigned-issuer
             ingress:
               enabled: false
-              https: false
-              ingressClassName: nginx
               hostname: argocd.demo
               annotations:
-                nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
                 cert-manager.io/cluster-issuer: selfsigned-issuer
               extraTls:
                 - secretName: argocd-cert
