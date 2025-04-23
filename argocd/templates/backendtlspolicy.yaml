@@ -14,5 +14,5 @@ spec:
       - group: ''
         kind: ConfigMap
         name: ca
-    hostname: argocd.dvoc24.v3nc.org
+    hostname: argocd.demo
 {{- end }}
