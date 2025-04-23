@@ -9,7 +9,7 @@ spec:
     - name: gateway
       namespace: gateway-nginx
   hostnames:
-    - argocd.dvoc24.v3nc.org
+    - argocd.demo
   rules:
     - backendRefs:
         - name: argocd-server
