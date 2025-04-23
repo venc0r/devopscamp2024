@@ -1,5 +1,5 @@
-# argo-cd:
-#   server:
+argo-cd:
+  server:
 #     # certificate:
 #     #   enabled: true
 #     #   domain: argocd.demo
@@ -7,16 +7,16 @@
 #     #     group: cert-manager.io
 #     #     kind: ClusterIssuer
 #     #     name: selfsigned-issuer
-#     ingress:
-#       enabled: true
-#       https: false
-#       ingressClassName: nginx
-#       hostname: argocd.demo
-#       annotations:
-#         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-#         cert-manager.io/cluster-issuer: selfsigned-issuer
-#       extraTls:
-#         - secretName: argocd-cert
-#           hosts:
-#             - argocd.demo
-#
+    ingress:
+      enabled: true
+      https: false
+      ingressClassName: nginx
+      hostname: argocd.demo
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        cert-manager.io/cluster-issuer: selfsigned-issuer
+      extraTls:
+        - secretName: argocd-cert
+          hosts:
+            - argocd.demo
+
