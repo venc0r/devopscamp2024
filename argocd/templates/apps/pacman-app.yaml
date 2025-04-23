@@ -21,6 +21,9 @@ spec:
     helm:
       values: |
         pacman:
+          mongodb:
+            auth:
+              rootPassword: stablePasswordForDemo
           ingress:
             create: true
             host: pacman.demo
