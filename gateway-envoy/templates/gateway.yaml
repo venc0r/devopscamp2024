@@ -4,7 +4,7 @@ kind: Gateway
 metadata:
   name: gateway
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-gateway
+    cert-manager.io/cluster-issuer: selfsigned-issuer
 spec:
   gatewayClassName: envoy-gatewayclass
   listeners:
@@ -17,7 +17,7 @@ spec:
     - name: argocd-listener
       port: 443
       protocol: HTTPS
-      hostname: "argocd.dvoc24.v3nc.org"
+      hostname: "argocd.demo"
       allowedRoutes:
         namespaces:
           from: All
@@ -25,11 +25,11 @@ spec:
         certificateRefs:
         - kind: Secret
           group: ""
-          name: argocd-dvoc24-v3nc-org
+          name: argocd-demo
     - name: pacman-listener
       port: 443
       protocol: HTTPS
-      hostname: "pacman.dvoc24.v3nc.org"
+      hostname: "pacman.demo"
       allowedRoutes:
         namespaces:
           from: All
@@ -37,5 +37,5 @@ spec:
         certificateRefs:
         - kind: Secret
           group: ""
-          name: pacman-dvoc24-v3nc-org
+          name: pacman-demo
         mode: Terminate
