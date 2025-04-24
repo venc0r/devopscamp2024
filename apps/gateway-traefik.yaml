@@ -30,7 +30,7 @@ spec:
               web:
                 namespacePolicy: All
               argocd-listener:
-                port: 443
+                port: 8443
                 protocol: HTTPS
                 hostname: "argocd.demo"
                 namespacePolicy: All
@@ -40,7 +40,7 @@ spec:
                   name: argocd-demo
                 mode: Terminate
               pacman-listener:
-                port: 443
+                port: 8443
                 protocol: HTTPS
                 hostname: "pacman.demo"
                 namespacePolicy: All
