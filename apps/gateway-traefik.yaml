@@ -25,29 +25,29 @@ spec:
             enabled: true
             name: gateway
             annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-gateway
+              cert-manager.io/cluster-issuer: selfsigned-issuer
             listeners:
               web:
                 namespacePolicy: All
               argocd-listener:
-                port: 8443 # .Values.ports.websecure.port
+                port: 443
                 protocol: HTTPS
-                hostname: "argocd.dvoc24.v3nc.org"
+                hostname: "argocd.demo"
                 namespacePolicy: All
                 certificateRefs:
                 - kind: Secret
                   group: ""
-                  name: argocd-dvoc24-v3nc-org
+                  name: argocd-demo
                 mode: Terminate
               pacman-listener:
-                port: 8443 # .Values.ports.websecure.port
+                port: 443
                 protocol: HTTPS
-                hostname: "pacman.dvoc24.v3nc.org"
+                hostname: "pacman.demo"
                 namespacePolicy: All
                 certificateRefs:
                 - kind: Secret
                   group: ""
-                  name: pacman-dvoc24-v3nc-org
+                  name: pacman-demo
                 mode: Terminate
           gatewayClass:
             enabled: true
