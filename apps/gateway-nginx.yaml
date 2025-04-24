@@ -18,6 +18,12 @@ spec:
     path: gateway-nginx
     repoURL: https://github.com/venc0r/devopscamp2024.git
     targetRevision: main
+    helm:
+      values: |
+        nginx-gateway-fabric:
+          nginxGateway:
+            gwAPIExperimentalFeatures:
+              enable: true
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
