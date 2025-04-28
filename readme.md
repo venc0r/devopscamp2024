@@ -1,18 +1,18 @@
 ---
-title: DEVOPS-Camp 2024 -- kubernetes ingress vs. gateway-api
+title: Bar-Camp 2025 -- kubernetes ingress vs. gateway-api
 author: venc0r (Jörg)
 theme:
   name: mytheme
 ---
 
-Install k3s without ingress
+Install minikube with metallb
 ===
 
 # Installing a simple kubernetes cluster based on k3s
 ```bash
-❯ minikube start -d kvm2 --cni=cilium --container-runtime=cri-o --cpu='4'
-❯ minikube addons install metallb
-❯ minikube addons configure metallb
+minikube start -d kvm2 --cni=cilium --container-runtime=cri-o --cpu='4'
+minikube addons enable metallb
+minikube addons configure metallb
 
 -- Enter Load Balancer Start IP: 192.168.39.100
 -- Enter Load Balancer End IP: 192.168.39.200
@@ -20,7 +20,7 @@ Install k3s without ingress
 
 # Check the cluster access
 ```bash
-❯ kubectl get nodes
+kubectl get nodes
 
 NAME       STATUS   ROLES           AGE     VERSION   INTERNAL-IP     EXTERNAL-IP
 minikube   Ready    control-plane   2d22h   v1.32.0   192.168.39.50   <none>
@@ -31,80 +31,31 @@ minikube   Ready    control-plane   2d22h   v1.32.0   192.168.39.50   <none>
 Install argocd
 ===
 
+# Download the helm chart
 ```bash
-❯ kubectl create ns argocd
-
-namespace/argocd created
-```
-
-```bash
-❯ helm dependency build argocd
-
-Getting updates for unmanaged Helm repositories...
-...Successfully got an update from the "https://argoproj.github.io/argo-helm" chart repository
-Hang tight while we grab the latest from your chart repositories...
-Update Complete. ⎈Happy Helming!⎈
+helm dependency build argocd
 Saving 1 charts
 Downloading argo-cd from repo https://argoproj.github.io/argo-helm
 Deleting outdated charts
+...
+```
+# Create the Namespace
+```bash
+kubectl create ns argocd
+namespace/argocd created
 ```
 
+# Apply the helm chart
 ```bash
-❯ helm template argocd --namespace argocd --include-crds argocd | kubectl apply -n argocd -f -
+helm template argocd --namespace argocd --include-crds argocd | kubectl apply -n argocd -f -
 
 serviceaccount/argocd-application-controller created
 serviceaccount/argocd-applicationset-controller created
-serviceaccount/argocd-notifications-controller created
-serviceaccount/argocd-repo-server created
-serviceaccount/argocd-server created
-serviceaccount/argocd-dex-server created
-secret/argocd-notifications-secret created
-secret/argocd-secret created
-configmap/argocd-cm created
-configmap/argocd-cmd-params-cm created
-configmap/argocd-gpg-keys-cm created
-configmap/argocd-notifications-cm created
-configmap/argocd-rbac-cm created
-configmap/argocd-ssh-known-hosts-cm created
-configmap/argocd-tls-certs-cm created
-configmap/argocd-redis-health-configmap created
-customresourcedefinition.apiextensions.k8s.io/applications.argoproj.io created
-customresourcedefinition.apiextensions.k8s.io/applicationsets.argoproj.io created
-customresourcedefinition.apiextensions.k8s.io/appprojects.argoproj.io created
-clusterrole.rbac.authorization.k8s.io/argocd-application-controller created
-clusterrole.rbac.authorization.k8s.io/argocd-notifications-controller created
-clusterrole.rbac.authorization.k8s.io/argocd-server created
-clusterrolebinding.rbac.authorization.k8s.io/argocd-application-controller created
-clusterrolebinding.rbac.authorization.k8s.io/argocd-notifications-controller created
-clusterrolebinding.rbac.authorization.k8s.io/argocd-server created
-role.rbac.authorization.k8s.io/argocd-application-controller created
-role.rbac.authorization.k8s.io/argocd-applicationset-controller created
-role.rbac.authorization.k8s.io/argocd-notifications-controller created
-role.rbac.authorization.k8s.io/argocd-repo-server created
-role.rbac.authorization.k8s.io/argocd-server created
-role.rbac.authorization.k8s.io/argocd-dex-server created
-rolebinding.rbac.authorization.k8s.io/argocd-application-controller created
-rolebinding.rbac.authorization.k8s.io/argocd-applicationset-controller created
-rolebinding.rbac.authorization.k8s.io/argocd-notifications-controller created
-rolebinding.rbac.authorization.k8s.io/argocd-repo-server created
-rolebinding.rbac.authorization.k8s.io/argocd-server created
-rolebinding.rbac.authorization.k8s.io/argocd-dex-server created
-service/argocd-applicationset-controller created
-service/argocd-repo-server created
-service/argocd-server created
-service/argocd-dex-server created
-service/argocd-redis created
-deployment.apps/argocd-applicationset-controller created
-deployment.apps/argocd-notifications-controller created
-deployment.apps/argocd-repo-server created
-deployment.apps/argocd-server created
-deployment.apps/argocd-dex-server created
-deployment.apps/argocd-redis created
-statefulset.apps/argocd-application-controller created
-serviceaccount/argocd-redis-secret-init created
-role.rbac.authorization.k8s.io/argocd-redis-secret-init created
-rolebinding.rbac.authorization.k8s.io/argocd-redis-secret-init created
-job.batch/argocd-redis-secret-init created
+...
+```
+# Install the applications, after the CRDs were created
+```bash
+kubectl apply -n argocd -f argocd/templates/app_of_apps.yaml
 ```
 
 <!-- end_slide -->
@@ -113,22 +64,20 @@ Access argocd with the created initial admin password and local portforwarding
 
 # To access argocd through the browser
 ```bash
-❯ kubectl port-forward -n argocd svc/argocd-server 8443:443 &!
+kubectl config set-context --current --namespace argocd
+kubectl port-forward  svc/argocd-server 8443:443 &!
 
 Forwarding from 127.0.0.1:8443 -> 8080
 Forwarding from [::1]:8443 -> 8080
 ```
 
 ```bash
-❯ helm template argocd --namespace argocd --include-crds argocd | kubectl apply -n argocd -f -
-❯ kubectl get secrets argocd-initial-admin-secret -o json | jq '.data.password' -r | base64 -d
-
-<redacted>
+kubectl get secrets argocd-initial-admin-secret -o json | jq '.data.password' -r | base64 -d | xclip -selection clipboard
 ```
 
 # With the argocd cli the `--core` flag uses the k8s-api
 ```bash
-❯ argocd app sync argocd --core --retry-limit 3
+argocd app sync argocd --core --retry-limit 3
 
 TIMESTAMP                  GROUP              KIND                            NAMESPACE
 2024-10-04T19:56:16+02:00                     ConfigMap                       argocd
@@ -139,50 +88,54 @@ argoproj.io  Application  argocd     argocd         Synced                applic
 argoproj.io  Application  argocd     ingress-nginx  Synced                application.ar...
 ```
 
-# Cert manager for automatic tls certificate generation from Let's Encrypt.
+# Cert manager for automatic tls certificate generation (from a self signed ca in the demo)
 ```bash
-❯ argocd app sync cert-manager --core --retry-limit 3
+argocd app sync cert-manager --core --retry-limit 3
 ```
 
 <!-- end_slide -->
-Sync the applications
+Installing ingress I
 ===
 # Install the NGINX Ingress Controller
 ```bash
-❯ argocd app sync ingress-nginx --core --retry-limit 3
-❯ kubectl get svc -n ingress-nginx
+argocd app sync ingress-nginx --core --retry-limit 3
+kubectl get svc -n ingress-nginx
 
 NAME                     TYPE          CLUSTER-IP    EXTERNAL-IP    PORT(S)
 ingress-nginx-controller LoadBalancer  10.110.60.161 192.168.39.100 80:32541/TCP,443:32572/TCP
 ```
 
 <!-- pause -->
-Sync the applications
+Installing ingress II
 ===
 # Contour is an ingress controller for Kubernetes that works by deploying the Envoy proxy
 ```bash
-❯ argocd app sync ingress-contour --core --retry-limit 3
-❯ kubectl get svc -n ingress-contour
+argocd app sync ingress-contour --core --retry-limit 3
+kubectl get svc -n ingress-contour
 
 NAME                  TYPE         CLUSTER-IP    EXTERNAL-IP    PORT(S)
 ingress-contour-envoy LoadBalancer 10.104.17.65  192.168.39.101 80:30407/TCP,443:32495/TCP
 ```
 
 <!-- end_slide -->
+Installing ingress III
+===
 # Ingress controller implementation for HAProxy LoadBalancer
 ```bash
-❯ argocd app sync ingress-haproxy --core --retry-limit 3
-❯ kubectl get svc -n ingress-haproxy
+argocd app sync ingress-haproxy --core --retry-limit 3
+kubectl get svc -n ingress-haproxy
 
 NAME                               TYPE         CLUSTER-IP     EXTERNAL-IP    PORT(S)
 ingress-haproxy-kubernetes-ingress LoadBalancer 10.103.220.236 192.168.39.102 80:30873/TCP,443:31417/TCP,443:31417/UDP,1024:31518/TCP
 ```
 
 <!-- pause -->
+Installing ingress IV
+===
 # Traefik Proxy as your Kubernetes Ingress Controller
 ```bash
-❯ argocd app sync ingress-traefik --core
-❯ kubectl get svc -n ingress-traefik
+argocd app sync ingress-traefik --core
+kubectl get svc -n ingress-traefik
 
 NAME             TYPE          CLUSTER-IP     EXTERNAL-IP    PORT(S)
 ingress-traefik  LoadBalancer  10.98.186.233  192.168.39.103 80:30607/TCP,443:32543/TCP
@@ -195,7 +148,7 @@ Access through ingress
 
 # Check Loadbalancer Services
 ```bash
-❯ kubectl get svc -A | grep LoadBalancer
+kubectl get svc -A | grep LoadBalancer
 
 NAMESPACE         NAME                                 TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)
 ingress-nginx     ingress-nginx-controller             LoadBalancer   10.110.60.161    192.168.39.100   80:32541/TCP,443:32572/TCP                                16h
@@ -204,30 +157,33 @@ ingress-haproxy   ingress-haproxy-kubernetes-ingress   LoadBalancer   10.103.220
 ingress-traefik   ingress-traefik                      LoadBalancer   10.98.186.233    192.168.39.103   80:30607/TCP,443:32543/TCP                                14h
 ```
 
-# Check the different values.yaml for each ingress-controller
+# sync pacman argocd application
+```bash
+argocd app sync pacman --core --retry-limit 3
 ```
-ingress-contour/values.yaml
-ingress-haproxy/values.yaml
-ingress-nginx/values.yaml
-ingress-traefik/values.yaml
+
+# enable ingress in the argocd app to enable access without port-forwarding
+```yaml
+# apps/argocd-app.yaml
+...
+values: |
+  argo-cd:
+    server:
+      ingress:
+        enabled: false # <- change this value to true
 ```
+
 <!-- end_slide -->
 
-Install pacman
+Access through ingress
 ===
-# sync pacman argocd application with values pacman/values.yaml
-
-```bash
-❯ argocd app sync pacman --core --retry-limit 3
-```
-
 # Check ingress
 ```bash
-❯ kubectl get ingress -n pacman
+kubectl get ingress -A
 
-NAMESPACE   NAME             CLASS    HOSTS         ADDRESS         PORTS     AGE
-argocd      argocd-server    nginx    argocd.demo                   80, 443   23h
-pacman      pacman-ingress   ?        pacman.demo                   80, 443   23h
+NAMESPACE   NAME             CLASS            HOSTS         ADDRESS         PORTS     AGE
+argocd      argocd-server    ingress-traefik   argocd.demo   192.168.39.103   80, 443   3m16s
+pacman      pacman-ingress   ingress-traefik   pacman.demo   192.168.39.103   80, 443   21m
 ```
 
 <!-- pause -->
@@ -235,24 +191,78 @@ pacman      pacman-ingress   ?        pacman.demo                   80, 443   23
 # Check ingressClasses
 ```bash
 
-❯ kubectl get ingressclass -o custom-columns=\
+kubectl get ingressclass -o custom-columns=\
 NAME:metadata.name,\
 CONTROLLER:.spec.controller,\
 DEFAULT:".metadata.annotations.ingressclass\.kubernetes\.io/is-default-class"
 
-NAME              CONTROLLER                                                  PARAMETERS
-contour           projectcontour.io/ingress-contour/ingress-contour-contour   <none>
+NAME              CONTROLLER                                                  DEFAULT
+contour           projectcontour.io/ingress-contour/ingress-contour-contour   true
 haproxy           haproxy.org/ingress-controller/haproxy                      <none>
-ingress-traefik   traefik.io/ingress-controller                               <none>
+ingress-traefik   traefik.io/ingress-controller                               true
 nginx             k8s.io/ingress-nginx                                        <none>
 ```
 
+<!-- end_slide -->
+Access through ingress
+===
 # pacman is accessible
 ```bash
-❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.100 -k
-❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.101 -k
-❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.102 -k
-❯ curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.103 -k
+curl https://pacman.demo -v -H 'Host: pacman.demo' --resolve pacman.demo:443:192.168.39.103 -k
+```
+
+# argocd ingress is not working
+```bash
+curl https://argocd.demo -v -H 'Host: argocd.demo' --resolve argocd.demo:443:192.168.39.103 -k
+```
+
+# check the docs how to do the ingress
+```
+https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress/#kubernetesingress-nginx
+```
+<!-- end_slide -->
+
+
+fixing argocd ingress
+===
+# set new values
+```yaml
+argo-cd:
+  server:
+    certificate:
+      enabled: true               # <- enabled the backend cert
+      domain: argocd.demo
+      issuer:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: selfsigned-issuer
+    ingress:
+      enabled: true
+      ingressClassName: nginx     # <- select the ingressClass explicit
+      hostname: argocd.demo
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # <- talk https to the backend
+        cert-manager.io/cluster-issuer: selfsigned-issuer
+      extraTls:
+        - secretName: argocd-cert
+          hosts:
+            - argocd.demo
+```
+<!-- end_slide -->
+fixing argocd ingress
+===
+
+# check change of the ingressClass
+```bash
+kubectl get ingress -n argocd
+
+NAME            CLASS   HOSTS         ADDRESS          PORTS     AGE
+argocd-server   nginx   argocd.demo   192.168.39.100   80, 443   22m
+```
+
+# test connectivity
+```bash
+curl https://argocd.demo -v -H 'Host: argocd.demo' --resolve argocd.demo:443:192.168.39.100 -k
 ```
 
 <!-- end_slide -->
@@ -268,9 +278,8 @@ Switch from ingress to gateway-api
 Switch from ingress to gateway-api
 ===
 
-# Install the gateway-api crds
 ```bash
-❯ kubectl apply -f gateway-api/standard-install.yaml
+kubectl apply -f gateway-api/standard-install.yaml
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
@@ -286,14 +295,11 @@ customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking
 - ReferenceGrant  => Granting the use of resources from different namespaces
 
 <!-- pause -->
-# Experimental vs. Standard crd
 ```bash
-❯ kubectl apply -f gateway-api/experimental-install.yaml
+kubectl apply -f gateway-api/experimental-install.yaml
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io configured
 ...
-customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io configured
-
 customresourcedefinition.apiextensions.k8s.io/backendlbpolicies.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/backendtlspolicies.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/tcproutes.gateway.networking.k8s.io created
@@ -308,59 +314,84 @@ customresourcedefinition.apiextensions.k8s.io/udproutes.gateway.networking.k8s.i
 - UDPRoute            => Routing rule for UDP traffic
 <!-- end_slide -->
 
-Install Envoy Gateway
+Enable Gateway Support for Cert-Manager and Install Envoy Gateway
 ===
 
 # Enabled cert-manager gateway-api support
-cert-manager/values.yaml
+apps/cert-manager-app.yaml
+```yaml
+values: |
+  cert-manager:
+    installCRDs: true
+    config:
+      apiVersion: "controller.config.cert-manager.io/v1alpha1"
+      kind: "ControllerConfiguration"
+      enableGatewayAPI: true
+```
 ```bash
-❯ argocd app sync cert-manager --core --retry-limit 3
+argocd app sync cert-manager --core --retry-limit 3
 ```
 
-# Removing ingress controllers apps and deploy gateway-envoy application
+# Deploy gateway-envoy application
 ```bash
-❯ argocd app delete ingress-traefik --core -y
-❯ argocd app delete ingress-haproxy --core -y
-❯ argocd app delete ingress-contour --core -y
-❯ argocd app delete ingress-nginx --core -y
-❯ argocd app sync gateway-envoy --core --retry-limit 3
-❯ argocd app sync pacman --core --retry-limit 3
+argocd app sync gateway-envoy --core --retry-limit 3
+```
+<!-- end_slide -->
+
+Setup Argocd and Pacman with httproute
+===
+# Edit argocd application to enabled http route for argocd and pacman
+```bash
+kubectl edit application pacman
+kubectl edit application argocd
+```
+```yaml
+values: |
+  enableGateway: true # <- from false to true
+```
+```bash
+argocd app sync pacman --core --retry-limit 3
+argocd app sync argocd --core --retry-limit 3
 ```
 
 <!-- pause -->
 
 # Argocd needs a BackendTLSPolicy to allow https backend traffic
 ```bash
-❯ openssl s_client -showcerts -verify 5 -connect localhost:8443 < /dev/null | tail -n81 | head -n31 > ca.crt
-❯ kubectl create cm ca --from-file ca.crt
-❯ kubectl get pods -n gateway-envoy | grep -v NAME | awk '{print $1}' | xargs kubectl delete pod -n gateway-envoy
+openssl s_client -showcerts -verify 5 -connect localhost:8443 < /dev/null | tail -n69 | head -n18 > ca.crt
+kubectl create cm -n argocd ca --from-file ca.crt
+kubectl get pods -n gateway-envoy -o name | xargs kubectl delete -n gateway-envoy
 ```
 argocd/templates/backendtlspolicy.yaml
 
 <!-- end_slide -->
 
-Install Traefik (v3) with gateway-api. (helm chart >v28.0.0)
+Install Traefik (v3) with gateway-api
 ===
 
-# Removing envoy and CRDs.
+# cleanup before install, the gateway-traefik is an ingress controller too
 ```bash
-❯ kubectl delete gateway -n gateway-envoy gateway
-❯ argocd app delete gateway-envoy --core -y
-❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+argocd app delete ingress-traefik --core --wait
+kubectl delete -f gateway-api/experimental-install.yaml
 ```
 
-# Create traefik application
+# Deploy traefik with gateway support and resync the apps
 ```bash
-❯ argocd app sync gateway-traefik --core --retry-limit 3
+argocd app sync gateway-traefik --core --retry-limit 3
+argocd app sync pacman --core --retry-limit 3
+argocd app sync argocd --core --retry-limit 3
 ```
 
 # Change httproutes to gateway-traefik parentRef
-- argocd/templates/httproute.yaml
-- pacman/templates/httproute.yaml
+```bash
+kubectl edit httproute -n pacman pacman.demo
+kubectl edit httproute -n argocd argocd.demo
+```
 
+<!-- pause -->
 ## Gateway and GatewayClass through helm values
 ## LoadBalancer SVC is created from helm chart
-## No support for BackendTLSPolicy yet (https://github.com/traefik/traefik/pull/11009 merged 3 weeks ago)
+## No support for BackendTLSPolicy yet (https://github.com/traefik/traefik/pull/11009 merged >6 month ago), but still not working
 <!-- end_slide -->
 
 Install haproxy with gateway-api
@@ -368,9 +399,9 @@ Install haproxy with gateway-api
 
 # Removing traefik and CRDs. Create haproxy application, haproxy requires an old CRD version.
 ```bash
-❯ argocd app delete gateway-traefik --core -y
-❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
-❯ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
+argocd app delete gateway-traefik --core --wait
+kubectl delete -f gateway-api/experimental-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
@@ -380,21 +411,14 @@ customresourcedefinition.apiextensions.k8s.io/referencepolicies.gateway.networki
 customresourcedefinition.apiextensions.k8s.io/tcproutes.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/tlsroutes.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/udproutes.gateway.networking.k8s.io created
-namespace/gateway-system created
-validatingwebhookconfiguration.admissionregistration.k8s.io/gateway-api-admission created
-service/gateway-api-admission-server created
-deployment.apps/gateway-api-admission-server created
-serviceaccount/gateway-api-admission created
-clusterrole.rbac.authorization.k8s.io/gateway-api-admission created
-clusterrolebinding.rbac.authorization.k8s.io/gateway-api-admission created
-role.rbac.authorization.k8s.io/gateway-api-admission created
-rolebinding.rbac.authorization.k8s.io/gateway-api-admission created
-job.batch/gateway-api-admission created
+...
 job.batch/gateway-api-admission-patch created
 
-❯ argocd app sync gateway-haproxy --core --retry-limit 3
+argocd app sync gateway-haproxy --core --retry-limit 3
+argocd app sync pacman --core --retry-limit 3
+argocd app sync argocd --core --retry-limit 3
 ```
-
+<!-- pause -->
 ## Old crds are used
 ## only TCP Route is supported
 ## LoadBalancer SVC from values
@@ -403,15 +427,15 @@ job.batch/gateway-api-admission-patch created
 Install nginx gateway fabric
 ===
 
-# Removing traefik-gateway and CRDs. Create gateway-traefik application, haproxy requires an old CRD version.
+# Removing haproxy-gateway and CRDs. Create gateway-traefik application, haproxy requires an old CRD version.
 ```bash
-❯ argocd app delete gateway-haproxy --core -y
-❯ kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
+argocd app delete gateway-haproxy --core -y
+kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
 ```
 
 # Apply nginx crd distribution
 ```bash
-❯ kubectl kustomize "https://github.com/nginxinc/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v1.4.0" | kubectl apply -f -
+kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v1.6.2" | kubectl apply -f -
 
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
@@ -421,7 +445,7 @@ customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking
 ```
 
 ```bash
-❯ kubectl kustomize "https://github.com/nginxinc/nginx-gateway-fabric/config/crd/gateway-api/experimental?ref=v1.4.0" | kubectl apply -f -
+kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/experimental?ref=v1.6.2" | kubectl apply -f -
 
 customresourcedefinition.apiextensions.k8s.io/backendtlspolicies.gateway.networking.k8s.io created
 customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io configured
@@ -440,16 +464,17 @@ Install nginx gateway fabric
 
 # Sync argocd to deploy gateway-nginx
 ```bash
-❯ argocd app sync gateway-nginx --core --retry-limit 3
+argocd app sync gateway-nginx --core --retry-limit 3
+argocd app sync pacman --core --retry-limit 3
+argocd app sync argocd --core --retry-limit 3
 ```
 
-# Change httproutes to gateway-traefik parentRef
-- argocd/templates/httproute.yaml
-- pacman/templates/httproute.yaml
+# Change httproutes to gateway-nginx parentRef
+kubectl edit httproute -n pacman pacman.demo
+kubectl edit httproute -n argocd argocd.demo
 
 ## GatewayClass from helm chart
 ## LoadBalancer SVC from values
-## backendTLSpolicies did not work for me (argocd)
 
 <!-- end_slide -->
 Conclution
@@ -484,7 +509,7 @@ https://gateway-api.sigs.k8s.io/implementations/
 Its not perfect
 ## You have to test each implementation how feature complete it is
 ## Complex helm values are still a thing (in some cases)
-## Only 1/4 of the implementation did work really well
+## Only 2/4 of the implementation did work really well
 
 -
 No benefits when
