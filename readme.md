@@ -77,6 +77,7 @@ kubectl get secrets argocd-initial-admin-secret -o json | jq '.data.password' -r
 
 # With the argocd cli the `--core` flag uses the k8s-api
 ```bash
+argocd app sync app-of-apps --core --retry-limit 3
 argocd app sync argocd --core --retry-limit 3
 
 TIMESTAMP                  GROUP              KIND                            NAMESPACE
